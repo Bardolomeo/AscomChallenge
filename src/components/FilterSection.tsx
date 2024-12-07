@@ -1,10 +1,10 @@
 import "react-calendar/dist/Calendar.css";
-import { handleFilterType } from "./PatientGrid";
+import { HandleFilterType } from "./PatientGrid";
 import BirthDateCalendar from "./UI/BirthDateCalendar";
 import SexCheckboxes from "./Checkboxes";
 
 type FilterProps = {
-  handleFilter: ({ which, e, date }: handleFilterType) => void;
+  handleFilter: ({ which, e, dates: date }: HandleFilterType) => void;
   searchFamilyItem: string;
   searchGivenItem: string;
 };
@@ -14,8 +14,6 @@ const FilterSection = ({
   searchFamilyItem,
   searchGivenItem,
 }: FilterProps) => {
-
-
   return (
     <div className="pt-8">
       <h3 className="font-sans font-semibold pb-4 text-xl">Filters:</h3>

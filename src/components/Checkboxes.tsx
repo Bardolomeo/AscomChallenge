@@ -1,31 +1,31 @@
 import { useEffect, useState } from "react";
-import { handleFilterType } from "./PatientGrid";
+import { HandleFilterType } from "./PatientGrid";
 
 const Checkboxes = ({
   handleFilter,
 }: {
-  handleFilter: ({ which }: handleFilterType) => void;
+  handleFilter: ({ which }: HandleFilterType) => void;
 }) => {
   const [isCheckedMale, setIsCheckedMale] = useState(true);
   const [isCheckedFemale, setIsCheckedFemale] = useState(true);
   const [isCheckedAlarm, setIsCheckedAlarm] = useState(true);
 
-
   useEffect(() => {
-    let sex : "M" | "F" | "MF" = "MF";
+    let sex: "M" | "F" | "MF" = "MF";
 
-    if (!isCheckedMale)
-      sex = "F";
-    if (!isCheckedFemale)
-      sex = "M";
-    if ((!isCheckedFemale && !isCheckedMale) || (isCheckedFemale && isCheckedMale))
+    if (!isCheckedMale) sex = "F";
+    if (!isCheckedFemale) sex = "M";
+    if (
+      (!isCheckedFemale && !isCheckedMale) ||
+      (isCheckedFemale && isCheckedMale)
+    )
       sex = "MF";
-    handleFilter({which: 'sex', sex })
-  }, [isCheckedMale, isCheckedFemale])
+    handleFilter({ which: "sex", sex });
+  }, [isCheckedMale, isCheckedFemale]);
 
   useEffect(() => {
-    handleFilter({which: 'alarm', alarm: isCheckedAlarm});
-  }, [isCheckedAlarm])
+    handleFilter({ which: "alarm", alarm: isCheckedAlarm });
+  }, [isCheckedAlarm]);
 
   return (
     <div className="flex gap-2">

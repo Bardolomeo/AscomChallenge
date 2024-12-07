@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import SortButtons from "./SortButtons";
 import FilterSection from "./FilterSection";
-import { orderDates } from "../utils/filteringUtils";
+import { isOrdered, orderDates } from "../utils/filteringUtils";
 
 type Parameter = {
   id: number;
@@ -11,7 +11,7 @@ type Parameter = {
   alarm: boolean;
 };
 
-type Patient = {
+export type Patient = {
   id: number;
   familyName: string;
   givenName: string;
@@ -20,10 +20,19 @@ type Patient = {
   parameters: Parameter[];
 };
 
-export type handleFilterType = {
+/**
+ * Typescript type for HandleFilterFunction
+ * every member except 'which' is optional and needed by the respective filter
+ * @member which: which filter has to be set up 
+ * @member e: event triggered by typing into familyName or givenName input Boxes,
+ * @member dates: array of two dates returned by the Calendar date range selection
+ * @member sex: takes the state (string) used to control sex checkboxes, it can be either one of 'M' , 'F', or 'MF' if both or neither checkboxes are selected
+ * @member alarm: takes the state used to control the Alarm? checkbox it can be true or false
+ */
+export type HandleFilterType = {
   which: string;
   e?: React.FormEvent<HTMLInputElement>;
-  date?: Date[];
+  dates?: Date[];
   sex?: "M" | "F" | "MF";
   alarm?: boolean;
 };
@@ -32,7 +41,12 @@ const PatientGrid = () => {
   const [patientList, setPatientList] = useState<Patient[]>([]);
   const [searchFamilyItem, setSearchFamilyItem] = useState<string>("");
   const [searchGivenItem, setSearchGivenItem] = useState<string>("");
-  const [searchDateItem, setSearchDateItem] = useState<Date[]>([new Date(" Jan 01 0100 00:00:00 GMT+0100 (Central European Standard Time)"), new Date("Thu Jan 01 2125 00:00:00 GMT+0100 (Central European Standard Time)")]);
+  const [searchDateItem, setSearchDateItem] = useState<Date[]>([
+    new Date(" Jan 01 0100 00:00:00 GMT+0100 (Central European Standard Time)"),
+    new Date(
+      "Thu Jan 01 2125 00:00:00 GMT+0100 (Central European Standard Time)"
+    ),
+  ]);
   const [searchSexItem, setSearchSexItem] = useState<"M" | "F" | "MF">("MF");
   const [searchAlarmedItem, setSearchAlarmedItem] = useState<boolean>(false);
   const [filteredList, setFilteredList] = useState<Patient[]>([]);
@@ -56,19 +70,33 @@ const PatientGrid = () => {
     }
   }
 
-
-  useEffect( () => {
+  /**
+   * This useEffect handles all filteredList state changes and sets the list used to map each element of the table
+   * 
+   */
+  useEffect(() => {
     const filteredItems = patientList.filter(
-    (pat) =>
-      pat.familyName.toLowerCase().includes(searchFamilyItem.toLowerCase()) &&
-      pat.givenName.toLowerCase().includes(searchGivenItem.toLowerCase()) &&
-      (pat.birthDate.toLocaleString() >= searchDateItem[0].toJSON() && pat.birthDate.toLocaleString() <= searchDateItem[1].toJSON()) &&
-      (pat.sex === searchSexItem || searchSexItem === "MF") &&
-      (searchAlarmedItem === alarm(pat.parameters))
-  );
-  setFilteredList(filteredItems);
-  }, [searchFamilyItem, searchGivenItem, searchDateItem, searchSexItem, searchAlarmedItem]);
+      (pat) =>
+        pat.familyName.toLowerCase().includes(searchFamilyItem.toLowerCase()) &&
+        pat.givenName.toLowerCase().includes(searchGivenItem.toLowerCase()) &&
+        pat.birthDate.toLocaleString() >= searchDateItem[0].toJSON() &&
+        pat.birthDate.toLocaleString() <= searchDateItem[1].toJSON() &&
+        (pat.sex === searchSexItem || searchSexItem === "MF") &&
+        searchAlarmedItem === alarm(pat.parameters)
+    );
+    setFilteredList(filteredItems);
+  }, [
+    searchFamilyItem,
+    searchGivenItem,
+    searchDateItem,
+    searchSexItem,
+    searchAlarmedItem,
+  ]);
 
+  /**
+   * Sorts List of patients, reverse it on double click
+   * @param by
+   */
   const sortList = (by: string) => {
     const orderedList = [...filteredList];
     switch (by) {
@@ -93,14 +121,29 @@ const PatientGrid = () => {
         break;
       }
       case "numberOfParams": {
-        orderedList.sort((a, b) => b.parameters.length -  a.parameters.length);
+        orderedList.sort((a, b) => b.parameters.length - a.parameters.length);
         break;
       }
     }
+    console.log(orderedList);
+    console.log(filteredList);
+    if (isOrdered(filteredList, orderedList)) orderedList.reverse();
     setFilteredList(orderedList);
   };
 
-  const handleFilter = ({ which, e, date, sex, alarm }: handleFilterType) => {
+  /**
+   *
+   * Look at HandleFilterType for more informations on how filters work
+   * @param param0
+   * @type {HandleFilterType}
+   */
+  const handleFilter = ({
+    which,
+    e,
+    dates: date,
+    sex,
+    alarm,
+  }: HandleFilterType) => {
     switch (which) {
       case "family": {
         const searchTerm = e!.currentTarget.value;
@@ -117,21 +160,18 @@ const PatientGrid = () => {
         setSearchDateItem(searchTerm);
         break;
       }
-      case "sex":
-      {
+      case "sex": {
         const searchTerm = sex!;
         setSearchSexItem(searchTerm);
         break;
       }
-      case "alarm":
-      {
+      case "alarm": {
         const searchTerm = alarm!;
         setSearchAlarmedItem(searchTerm);
         break;
       }
     }
   };
-
 
   /**
    * check if at least one parameter has alarm === true
@@ -165,17 +205,21 @@ const PatientGrid = () => {
         </thead>
         <tbody>
           {filteredList[0] ? (
-            filteredList.map((pat) => (
-              <tr key={pat.id}>
-                <td>{pat.familyName}</td>
-                <td>{pat.givenName}</td>
-                <td>{new Date(pat.birthDate).toLocaleDateString("it-IT")}</td>
-                <td>{pat.sex}</td>
-                <td className={`${alarm(pat.parameters) ? "bg-red-600 " : ""}`}>
-                  <div className="w-full flex justify-center">{pat.parameters.length}</div>
-                </td>
-              </tr>
-            ))
+            filteredList.map(
+              ({ id, familyName, givenName, birthDate, sex, parameters }) => (
+                <tr key={id}>
+                  <td>{familyName}</td>
+                  <td>{givenName}</td>
+                  <td>{new Date(birthDate).toLocaleDateString("it-IT")}</td>
+                  <td>{sex}</td>
+                  <td className={`${alarm(parameters) ? "bg-red-600 " : ""}`}>
+                    <div className="w-full flex justify-center">
+                      {parameters.length}
+                    </div>
+                  </td>
+                </tr>
+              )
+            )
           ) : (
             <tr>
               <td>

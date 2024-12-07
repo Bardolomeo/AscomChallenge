@@ -1,3 +1,5 @@
+import { Patient } from "../components/PatientGrid";
+
 export function orderDates(dates: Date[])
 {
   let retDateArr: Date[] = [];
@@ -17,4 +19,11 @@ export function orderDates(dates: Date[])
   }
 
   return retDateArr;
+}
+
+export function isOrdered(src: Patient[], ordered: Patient[]) {
+  for (let i = 0; i < ordered.length; i++)
+    if (ordered[i] !== src[i])
+      return false;
+  return true;
 }

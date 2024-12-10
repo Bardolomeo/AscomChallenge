@@ -62,8 +62,15 @@ const PatientGrid = () => {
           },
         })
         .then((response) => {
-          setPatientList(response.data);
-          setFilteredList(response.data);
+          let list: Patient[] = [response.data[0]];
+          response.data.forEach((el: Patient) => 
+          {
+            console.log()
+            if (!list.find(({id}) => id === el.id))
+              list.push(el);
+          })
+          setPatientList(list);
+          setFilteredList(list);
         });
     } catch {
       console.log("failed to retrieve datas from API");

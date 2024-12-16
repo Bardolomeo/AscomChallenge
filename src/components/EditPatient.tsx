@@ -1,6 +1,6 @@
 import { FormEvent, useRef } from "react";
 import { useState } from "react";
-import { FaEye } from "react-icons/fa"
+import { FaEdit } from "react-icons/fa"
 import { Patient } from "./PatientGrid";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -8,9 +8,14 @@ import { IoMdClose } from "react-icons/io";
 import axios from "axios";
 gsap.registerPlugin(useGSAP);
 
+type EditPatient = 
+{
+	patient : Patient;
+	idx: number
+	getPatientList: () => void;
+};
 
-
-const EditPatient = ({patient, idx} : {patient : Patient; idx: number}) => {
+const EditPatient = ({patient, idx, getPatientList = () => {}} : EditPatient) => {
 
   const [editPatient, setEditPatient] = useState<Patient | undefined>(null!);
   const tableRef = useRef<HTMLDivElement>(null!);
@@ -36,7 +41,10 @@ const EditPatient = ({patient, idx} : {patient : Patient; idx: number}) => {
 			auth: {
 				username: import.meta.env.VITE_API_USER,
 				password: import.meta.env.VITE_API_PASS,
-			  }},).then(() => window.location.reload()).catch((e) => alert(e))
+			  }},).then(() => {
+				getPatientList();
+				setEditPatient(undefined);
+			  }).catch((e) => alert(e))
   }
 
   useGSAP(() => {
@@ -59,7 +67,7 @@ const EditPatient = ({patient, idx} : {patient : Patient; idx: number}) => {
 	<td className="bg-transparent border-none">
 		<div className="pr-8 scale-150 opacity-70">
 			<button onClick={() => setEditPatient(patient)}>
-				<FaEye/>
+				<FaEdit/>
 			</button>
 		</div>
 		<div 

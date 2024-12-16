@@ -223,7 +223,7 @@ const PatientGrid = () => {
                             {parameters.length}
                           </div>
                         </td>
-                        <EditPatient patient={{ id, familyName, givenName, birthDate, sex, parameters }} idx={idx}/>
+                        <EditPatient patient={{ id, familyName, givenName, birthDate, sex, parameters }} idx={idx} getPatientList={getPatientList}/>
                     </tr>
               )
             )

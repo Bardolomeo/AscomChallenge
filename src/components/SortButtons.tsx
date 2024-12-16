@@ -2,7 +2,8 @@
 
 const SortButtons = ({sortList = (by: string) => {}}) => {
   
-	const buttonCN = "rounded-full border-[1px] border-solid border-black px-3 py-1 w-32 shadow-lg hover:bg-[#E0E0E0] bg-[#AD9494]"
+	const buttonCN =
+    "rounded-full border-2 border-solid border-[#497faa] px-3 py-1 w-32 shadow-lg hover:bg-[#9db6cd] hover:border-[#9db6cd] hover:text-white font-semibold bg-[#white] text-[#497faa]"
 
 	return (
 	<div className="pt-16">

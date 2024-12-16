@@ -9,7 +9,7 @@ type BirthDateCalendarProps = {
 const BirthDateCalendar = ({ handleFilter }: BirthDateCalendarProps) => {
   const [visibleCalendar, setVisibleCalendar] = useState(false);
   const buttonCN =
-    "rounded-full border-[1px] border-solid border-black px-3 py-1 w-32 shadow-lg hover:bg-[#E0E0E0] font-semibold bg-[#AD9494]";
+    "rounded-full border-2 border-solid border-[#497faa] px-3 py-1 w-32 shadow-lg hover:bg-[#9db6cd] hover:border-[#9db6cd] hover:text-white font-semibold bg-[#white] text-[#497faa]";
 
   const defaultDates = [
     new Date(" Jan 01 0100 00:00:00 GMT+0100 (Central European Standard Time)"),

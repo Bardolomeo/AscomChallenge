@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import SortButtons from "./SortButtons";
 import FilterSection from "./FilterSection";
 import { isOrdered, orderDates } from "../utils/filteringUtils";
+import EditPatient from "./EditPatient";
 
 type Parameter = {
   id: number;
@@ -125,8 +126,6 @@ const PatientGrid = () => {
         break;
       }
     }
-    console.log(orderedList);
-    console.log(filteredList);
     if (isOrdered(filteredList, orderedList)) orderedList.reverse();
     setFilteredList(orderedList);
   };
@@ -192,10 +191,10 @@ const PatientGrid = () => {
   }, []);
 
   return (
-    <div>
+    <div className="">
       <table className="table-fixed">
         <thead>
-          <tr>
+          <tr className="text-[#121e28]">
             <th>Family Name</th>
             <th>Given Name</th>
             <th>Birth Date</th>
@@ -206,18 +205,19 @@ const PatientGrid = () => {
         <tbody>
           {filteredList[0] ? (
             filteredList.map(
-              ({ id, familyName, givenName, birthDate, sex, parameters }) => (
-                <tr key={id}>
-                  <td>{familyName}</td>
-                  <td>{givenName}</td>
-                  <td>{new Date(birthDate).toLocaleDateString("it-IT")}</td>
-                  <td>{sex}</td>
-                  <td className={`${alarm(parameters) ? "bg-red-600 " : ""}`}>
-                    <div className="w-full flex justify-center">
-                      {parameters.length}
-                    </div>
-                  </td>
-                </tr>
+              ({ id, familyName, givenName, birthDate, sex, parameters }, idx) => (
+                    <tr key={idx}>
+                        <td>{familyName}</td>
+                        <td>{givenName}</td>
+                        <td>{new Date(birthDate).toLocaleDateString("it-IT")}</td>
+                        <td className="text-center">{sex}</td>
+                        <td className={`${alarm(parameters) ? "bg-red-600 " : ""}`}>
+                          <div className="w-full flex justify-center">
+                            {parameters.length}
+                          </div>
+                        </td>
+                        <EditPatient patient={{ id, familyName, givenName, birthDate, sex, parameters }} idx={idx}/>
+                    </tr>
               )
             )
           ) : (

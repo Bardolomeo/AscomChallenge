@@ -5,8 +5,10 @@
 
 td {
   padding: 1rem 3rem;
-  border: 2px solid black;
+  border: 2px solid #335673;
   justify-content: center;
   justify-items: center;
   background-color: #EBEAEA;
+  min-width: 10rem;
+  color: #121e28;
 }
